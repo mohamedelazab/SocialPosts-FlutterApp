@@ -15,10 +15,36 @@ class _UsersListScreenState extends State<UsersListScreen> {
   final UsersApi _usersApi = UsersApi();
   late Future<List<UserModel>> _usersFuture;
 
+  // Store full list and filtered list
+  List<UserModel> _allUsers = [];
+  List<UserModel> _filteredUsers = [];
+
+  // Search field controller
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     _usersFuture = _usersApi.getUsers();
+    _searchController.addListener(_filterUsers);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_filterUsers);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterUsers() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredUsers = _allUsers.where((user) {
+        return user.name.toLowerCase().contains(query) ||
+            user.email.toLowerCase().contains(query) ||
+            user.companyName.toLowerCase().contains(query);
+      }).toList();
+    });
   }
 
   @override
@@ -38,66 +64,103 @@ class _UsersListScreenState extends State<UsersListScreen> {
             );
           }
 
-          final users = snapshot.data ?? [];
+          // Initialize user lists once data is loaded
+          if (_allUsers.isEmpty) {
+            _allUsers = snapshot.data ?? [];
+            _filteredUsers = List.from(_allUsers);
+          }
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: users.length,
-            itemBuilder: (context, index) {
-              final user = users[index];
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+          return Column(
+            children: [
+              // Search box
+              Padding(
+                padding: const EdgeInsets.all(16),
                 child: Material(
                   color: Colors.white,
-                  // Card background color
                   elevation: 2,
-                  // Card elevation
                   borderRadius: BorderRadius.circular(12),
-                  // same as card corners
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    // ripple respects card corners
-                    onTap: () {
-                      context.push('/profile/${user.id}');
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Search users...",
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(child: Text(user.name[0])),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 4), // vertical spacing
-                                Text(user.email),
-                                const SizedBox(height: 4), // vertical spacing
-                                Text(
-                                  user.companyName,
-                                  style: const TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Icon(Icons.arrow_forward_ios, size: 16),
-                        ],
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
-              );
-            },
+              ),
+              // Users list
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _filteredUsers.length,
+                  itemBuilder: (context, index) {
+                    final user = _filteredUsers[index];
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Material(
+                        color: Colors.white,
+                        elevation: 2,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            context.push('/profile/${user.id}');
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(child: Text(user.name[0])),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(user.email),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        user.companyName,
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(Icons.arrow_forward_ios, size: 16),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
       ),
