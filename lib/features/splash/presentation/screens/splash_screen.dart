@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../users/presentation/screens/users_list_screen.dart';
+import 'package:go_router/go_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,17 +13,20 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeApp();
+    // Wait for first frame to ensure GoRouter context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeApp();
+    });
   }
 
   Future<void> _initializeApp() async {
+    // Simulate loading / initialization
     await Future.delayed(const Duration(seconds: 2));
 
     if (!mounted) return;
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const UsersListScreen()),
-    );
+    // Replace splash with users list
+    context.replace('/users');
   }
 
   @override
@@ -38,9 +41,9 @@ class _SplashScreenState extends State<SplashScreen> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+          children: const [
             _AppLogo(),
             SizedBox(height: 24),
             Text(
@@ -53,7 +56,10 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             SizedBox(height: 32),
-            CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+            CircularProgressIndicator(
+              color: Colors.white,
+              strokeWidth: 3,
+            ),
           ],
         ),
       ),

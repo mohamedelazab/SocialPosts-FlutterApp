@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/gradient_app_bar.dart';
 import '../../data/users_api.dart';
 import '../../data/models/user_model.dart';
@@ -58,7 +59,7 @@ class _UsersListScreenState extends State<UsersListScreen> {
                     borderRadius: BorderRadius.circular(12),
                     // ripple respects card corners
                     onTap: () {
-                      // Handle tap
+                      context.push('/profile/${user.id}');
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

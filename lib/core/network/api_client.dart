@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'endpoints.dart';
 
@@ -11,7 +12,9 @@ class ApiClient {
     final uri = Uri.parse("${Endpoints.baseUrl}$path")
         .replace(queryParameters: query);
 
-    print("REQUEST URL: $uri");
+    if (kDebugMode) {
+      print("REQUEST URL: $uri");
+    }
 
     final response = await _client.get(
       uri,
@@ -21,7 +24,9 @@ class ApiClient {
       },
     );
 
-    print("STATUS CODE: ${response.statusCode}");
+    if (kDebugMode) {
+      print("STATUS CODE: ${response.statusCode}");
+    }
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
