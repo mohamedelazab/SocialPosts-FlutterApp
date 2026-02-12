@@ -1,16 +1,24 @@
-# social_posts
+# 🚀 social_posts (A new Flutter project Work in Progress)
 
-A new Flutter project.
+Hello! 👋 I'm currently working on this app, and it's actively in progress. Here’s a sneak peek at what’s implemented so far:  
 
-## Getting Started
+Hello! 👋 I'm currently working on this app, and it's actively in progress. Here’s a sneak peek at what’s implemented so far:  
 
-This project is a starting point for a Flutter application.
+### 🛠 Features Implemented
+- 🌟 **Splash Screen** – A smooth intro when the app starts  
+- 👥 **Users List** – Browse through the list of users  
+- 📝 **User Profile** – Currently in progress  
 
-A few resources to get you started if this is your first Flutter project:
+### 🔗 API Endpoint
+This project uses the [JSONPlaceholder API](https://jsonplaceholder.typicode.com/) for demo data:  
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Below are some screenshots of the current app screens:  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![App Screens]([./path-to-your-image.png](https://github.com/user-attachments/assets/557675d2-42e1-4318-8113-0d1e5d3ed566))  
+
+### ⚡ What's Next
+- Finish **User Profile**  
+- Add more interactive features  
+- Improve UI/UX  
+
+Stay tuned for updates! 💡
