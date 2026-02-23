@@ -8,7 +8,12 @@ class ApiClient {
 
   ApiClient(this._client);
 
-  Future<List<dynamic>> getList(String path, {Map<String, String>? query}) async {
+  // ================= COMMON GET METHOD =================
+
+  Future<http.Response> _getRequest(
+      String path, {
+        Map<String, String>? query,
+      }) async {
     final uri = Uri.parse("${Endpoints.baseUrl}$path")
         .replace(queryParameters: query);
 
@@ -28,24 +33,40 @@ class ApiClient {
       print("STATUS CODE: ${response.statusCode}");
     }
 
+    return response;
+  }
+
+  // ================= GET LIST =================
+
+  Future<List<dynamic>> getList(
+      String path, {
+        Map<String, String>? query,
+      }) async {
+    final response = await _getRequest(path, query: query);
+
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as List<dynamic>;
     } else {
-      throw Exception("API Error: ${response.statusCode}");
+      throw Exception(
+        "API Error (${response.statusCode}): ${response.body}",
+      );
     }
   }
 
+  // ================= GET SINGLE ITEM =================
 
-
-  Future<Map<String, dynamic>> getItem(String path) async {
-    final uri = Uri.parse("${Endpoints.baseUrl}$path");
-
-    final response = await _client.get(uri);
+  Future<Map<String, dynamic>> getItem(
+      String path, {
+        Map<String, String>? query,
+      }) async {
+    final response = await _getRequest(path, query: query);
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(response.body) as Map<String, dynamic>;
     } else {
-      throw Exception("API Error");
+      throw Exception(
+        "API Error (${response.statusCode}): ${response.body}",
+      );
     }
   }
 }
