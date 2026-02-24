@@ -1,9 +1,10 @@
 import 'package:http/http.dart' as http;
 import '../../../core/network/api_client.dart';
 import '../../../core/network/endpoints.dart';
-import 'models/album_model.dart';
-import 'models/posts_model.dart';
-import 'models/todo_model.dart';
+import '../../profile/data/models/album_model.dart';
+import '../../profile/data/models/photo_model.dart';
+import '../../profile/data/models/posts_model.dart';
+import '../../profile/data/models/todo_model.dart';
 import 'models/user_model.dart';
 
 class UsersApi {
@@ -45,5 +46,12 @@ class UsersApi {
     final response = await _apiClient.getList(Endpoints.userTodos(userId));
 
     return response.map<TodoModel>((json) => TodoModel.fromJson(json)).toList();
+  }
+
+  Future<List<PhotoModel>> getAlbumPhotos(int albumId) async {
+    final response = await _apiClient.getList(Endpoints.albumPhotos(albumId));
+    return response
+        .map<PhotoModel>((json) => PhotoModel.fromJson(json))
+        .toList();
   }
 }

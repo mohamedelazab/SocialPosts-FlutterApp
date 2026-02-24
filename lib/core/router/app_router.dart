@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/profile/presentation/screen/album_screen.dart';
 import '../../features/profile/presentation/screen/user_profile_screen.dart';
 import '../../features/splash/presentation/screens/splash_screen.dart';
 import '../../features/users/presentation/screens/users_list_screen.dart';
@@ -32,6 +33,19 @@ class AppRouter {
           return UserProfileScreen(userId: userId);
         },
       ),
+
+      /// Album Screen
+      GoRoute(
+        path: '/album/:albumId',
+        name: 'album',
+        builder: (context, state) {
+          final albumId = int.parse(state.pathParameters['albumId']!);
+          final albumTitle = state.extra as String? ?? "Album";
+
+          return AlbumScreen(albumId: albumId, albumTitle: albumTitle);
+        },
+      ),
+
     ],
   );
 }

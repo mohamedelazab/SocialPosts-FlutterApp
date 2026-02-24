@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/widgets/gradient_app_bar.dart';
-import '../../../users/data/models/album_model.dart';
-import '../../../users/data/models/posts_model.dart';
-import '../../../users/data/models/todo_model.dart';
+import '../../data/models/album_model.dart';
+import '../../data/models/posts_model.dart';
+import '../../data/models/todo_model.dart';
 import '../../../users/data/models/user_model.dart';
 import '../../../users/data/users_api.dart';
 
@@ -46,9 +47,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             }
 
             if (snapshot.hasError) {
-              return Center(
-                child: Text("Error: ${snapshot.error}"),
-              );
+              return Center(child: Text("Error: ${snapshot.error}"));
             }
 
             final user = snapshot.data!;
@@ -56,15 +55,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             return NestedScrollView(
               headerSliverBuilder: (context, innerBoxIsScrolled) {
                 return [
-                  SliverToBoxAdapter(
-                    child: _buildProfileHeader(user),
-                  ),
+                  SliverToBoxAdapter(child: _buildProfileHeader(user)),
                   SliverAppBar(
                     pinned: false,
                     automaticallyImplyLeading: false,
                     backgroundColor: Colors.white,
                     elevation: 0,
-                    toolbarHeight: 0, // <-- remove default height
+                    toolbarHeight: 0,
+                    // <-- remove default height
                     bottom: const TabBar(
                       indicatorColor: Colors.blue,
                       labelColor: Colors.blue,
@@ -79,11 +77,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ];
               },
               body: TabBarView(
-                children: [
-                  _buildPosts(),
-                  _buildAlbums(),
-                  _buildTodos(),
-                ],
+                children: [_buildPosts(), _buildAlbums(), _buildTodos()],
               ),
             );
           },
@@ -103,18 +97,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         children: [
           CircleAvatar(
             radius: 40,
-            child: Text(
-              user.name[0],
-              style: const TextStyle(fontSize: 30),
-            ),
+            child: Text(user.name[0], style: const TextStyle(fontSize: 30)),
           ),
           const SizedBox(height: 12),
           Text(
             user.name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Text(user.email),
           const SizedBox(height: 6),
@@ -157,9 +145,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   children: [
                     Text(
                       post.title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 6),
                     Text(post.body),
@@ -195,6 +181,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               margin: const EdgeInsets.only(bottom: 12),
               child: ListTile(
                 title: Text(album.title),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  context.push(
+                    '/album/${album.id}',
+                    extra: album.title,
+                  );
+                },
               ),
             );
           },
