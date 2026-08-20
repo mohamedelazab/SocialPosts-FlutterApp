@@ -21,5 +21,7 @@ class Endpoints {
   static String albumPhotos(int albumId) => "$albums/$albumId/photos";
 
   // Post
+  static String postById(int id) => "$posts/$id";
+
   static String postComments(int postId) => "$posts/$postId/comments";
 }

@@ -6,6 +6,8 @@ class UserModel {
   final String phone;
   final String website;
   final String companyName;
+  final String companyCatchPhrase;
+  final String city;
 
   UserModel({
     required this.id,
@@ -15,6 +17,8 @@ class UserModel {
     required this.phone,
     required this.website,
     required this.companyName,
+    required this.companyCatchPhrase,
+    required this.city,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +29,9 @@ class UserModel {
       email: json['email'],
       phone: json['phone'],
       website: json['website'],
-      companyName: json['company']['name'],
+      companyName: json['company']?['name'] ?? '',
+      companyCatchPhrase: json['company']?['catchPhrase'] ?? '',
+      city: json['address']?['city'] ?? '',
     );
   }
 }

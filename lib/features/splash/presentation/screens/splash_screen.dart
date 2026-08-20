@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -13,76 +12,60 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Wait for first frame to ensure GoRouter context is ready
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeApp();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _goToFeed());
   }
 
-  Future<void> _initializeApp() async {
-    // Simulate loading / initialization
-    await Future.delayed(const Duration(seconds: 2));
-
+  Future<void> _goToFeed() async {
+    // Brief brand beat, not a fake network wait.
+    await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) return;
-
-    // Replace splash with users list
-    context.replace('/users');
+    context.replace('/feed');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      backgroundColor: const Color(0xFF16261F),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            _AppLogo(),
-            SizedBox(height: 24),
-            Text(
-              "SocialHub Demo",
+          children: [
+            Container(
+              height: 74,
+              width: 74,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+              ),
+              child: const Icon(Icons.groups_outlined, size: 32, color: Colors.white),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              "Commons",
               style: TextStyle(
+                fontFamily: 'serif',
                 color: Colors.white,
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
+                fontSize: 26,
+                letterSpacing: 0.4,
               ),
             ),
-            SizedBox(height: 32),
-            CircularProgressIndicator(
-              color: Colors.white,
-              strokeWidth: 3,
+            const SizedBox(height: 6),
+            Text(
+              "where your circle shows up",
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 11.5),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2.4,
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _AppLogo extends StatelessWidget {
-  const _AppLogo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 90,
-      width: 90,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Icon(
-        Icons.chat_bubble_outline,
-        size: 45,
-        color: Color(0xFF1565C0),
       ),
     );
   }

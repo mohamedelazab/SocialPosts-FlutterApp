@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/widgets/gradient_app_bar.dart';
-import '../../data/users_api.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_error.dart';
+import '../../../../core/widgets/app_loader.dart';
+import '../../../../core/widgets/initials_avatar.dart';
 import '../../data/models/user_model.dart';
+import '../../data/users_api.dart';
 
 class UsersListScreen extends StatefulWidget {
   const UsersListScreen({super.key});
@@ -15,144 +19,133 @@ class _UsersListScreenState extends State<UsersListScreen> {
   final UsersApi _usersApi = UsersApi();
   late Future<List<UserModel>> _usersFuture;
 
-  // Store full list and filtered list
   List<UserModel> _allUsers = [];
-  List<UserModel> _filteredUsers = [];
-
-  // Search field controller
   final TextEditingController _searchController = TextEditingController();
+  String _query = "";
 
   @override
   void initState() {
     super.initState();
     _usersFuture = _usersApi.getUsers();
-    _searchController.addListener(_filterUsers);
-  }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_filterUsers);
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filterUsers() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _filteredUsers = _allUsers.where((user) {
-        return user.name.toLowerCase().contains(query) ||
-            user.email.toLowerCase().contains(query) ||
-            user.companyName.toLowerCase().contains(query);
-      }).toList();
+    _searchController.addListener(() {
+      setState(() => _query = _searchController.text.toLowerCase());
     });
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final semantic = Theme.of(context).extension<AppSemanticColors>()!;
+
     return Scaffold(
-      appBar: const GradientAppBar(title: "Users"),
+      appBar: AppBar(
+        title: const Text("People"),
+        titleSpacing: 20,
+        toolbarHeight: 60,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(0),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 20, bottom: 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                _allUsers.isEmpty
+                    ? "The directory"
+                    : "${_allUsers.length} in the directory",
+                style: TextStyle(color: semantic.inkDim, fontSize: 12),
+              ),
+            ),
+          ),
+        ),
+      ),
       body: FutureBuilder<List<UserModel>>(
         future: _usersFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const AppLoader();
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Text("Something went wrong\n${snapshot.error}"),
+            return AppError(
+              message: "${snapshot.error}",
+              onRetry: () => setState(() => _usersFuture = _usersApi.getUsers()),
             );
           }
 
-          // Initialize user lists once data is loaded
-          if (_allUsers.isEmpty) {
-            _allUsers = snapshot.data ?? [];
-            _filteredUsers = List.from(_allUsers);
-          }
+          _allUsers = snapshot.data ?? [];
+          final filtered = _allUsers.where((user) {
+            if (_query.isEmpty) return true;
+            return user.name.toLowerCase().contains(_query) ||
+                user.email.toLowerCase().contains(_query) ||
+                user.companyName.toLowerCase().contains(_query) ||
+                user.city.toLowerCase().contains(_query);
+          }).toList();
 
           return Column(
             children: [
-              // Search box
               Padding(
-                padding: const EdgeInsets.all(16),
-                child: Material(
-                  color: Colors.white,
-                  elevation: 2,
-                  borderRadius: BorderRadius.circular(12),
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search users...",
-                      prefixIcon: const Icon(Icons.search),
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    hintText: "Search by name, company, city…",
+                    prefixIcon: Icon(Icons.search),
                   ),
                 ),
               ),
-              // Users list
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _filteredUsers.length,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  itemCount: filtered.length,
                   itemBuilder: (context, index) {
-                    final user = _filteredUsers[index];
+                    final user = filtered[index];
 
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Material(
-                        color: Colors.white,
-                        elevation: 2,
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            context.push('/profile/${user.id}');
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(child: Text(user.name[0])),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(user.email),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        user.companyName,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  ),
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () => context.push('/profile/${user.id}'),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          child: Row(
+                            children: [
+                              InitialsAvatar(name: user.name, radius: 19),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w700, fontSize: 14),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "@${user.username} · ${user.companyName}",
+                                      style: TextStyle(
+                                          color: semantic.inkDim, fontSize: 11.5),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                const Icon(Icons.arrow_forward_ios, size: 16),
+                              ),
+                              if (user.city.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Chip(
+                                  label: Text(user.city),
+                                  visualDensity: VisualDensity.compact,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
                               ],
-                            ),
+                            ],
                           ),
                         ),
                       ),
