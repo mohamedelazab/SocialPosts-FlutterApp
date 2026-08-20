@@ -30,9 +30,9 @@ to-dos. Built as a clean-architecture playground on top of the
 
 ## Screens
 
-| Feed | People | Post detail |
-|---|---|---|
-| <img src="docs/screenshots/feed.png" width="220" /> | <img src="docs/screenshots/people.png" width="220" /> | <img src="docs/screenshots/post_detail.png" width="220" /> |
+| Feed | People | Post detail | Album |
+|---|---|---|---|
+| <img src="docs/screenshots/feed.png" width="200" /> | <img src="docs/screenshots/people.png" width="200" /> | <img src="docs/screenshots/post_detail.png" width="200" /> | <img src="docs/screenshots/album.png" width="200" /> |
 
 ## Architecture
 
@@ -65,6 +65,9 @@ Album, and the photo viewer are pushed on top and hide the bottom bar.
 - [`http`](https://pub.dev/packages/http) for networking
 - [JSONPlaceholder](https://jsonplaceholder.typicode.com/) as a fake REST
   backend (users, posts, comments, albums, photos, todos)
+- [picsum.photos](https://picsum.photos) for album/photo images — JSONPlaceholder's
+  own photo URLs point at the now-defunct via.placeholder.com, so `PhotoModel`
+  reseeds each photo's `id` against picsum instead
 
 ## Getting started
 
@@ -78,14 +81,10 @@ Requires Flutter 3.x+ with a configured Android/iOS toolchain. No API keys or
 
 ## Known limitations
 
-- JSONPlaceholder's `photos` endpoint returns `via.placeholder.com` image
-  URLs, a service that's no longer reliably reachable — album photo
-  thumbnails may not load as a result.
 - No offline caching or persistence layer yet — every screen fetches fresh
   on open.
 
 ## Roadmap
 
-- Swap album photo source to a live placeholder service (e.g. `picsum.photos`)
 - Pull-to-refresh on the feed and profile
 - Unit/widget test coverage
